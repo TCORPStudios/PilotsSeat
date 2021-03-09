@@ -64,8 +64,9 @@ def codeInterpreter(code):
 
 def progRun(programVar):  #progRun is ran to interpret input and run programs.
     global programsRan
-    for i in range(0, ((len(codeNumbers)) - 1),
-                   1):  #Makes a loop from 0 to the length of codeNumbers.
+    global codeNumbers
+    codesMax = ((len(codeNumbers))) #Makes a variable that measures how many codes there are.
+    for i in range(0, codesMax, 1):  #Makes a loop from 0 to the length of codeNumbers via the codesMax variable.
         if programVar == i:
             print(Fore.WHITE + "Running program #" +
                   str(codeNumbers[programVar]))
@@ -91,18 +92,18 @@ def prog0(): #Program 101, status checking.
     print(Fore.GREEN + "PROGRAMS RAN :" + Fore.WHITE + str(programsRan))
 
     codeInput()
-def prog8(): #Program 601, Fuel Cell kick.
-  global fuelMax
-  global fuelLvl
-  global cellMax
-  global cellMin
-  time.sleep(fakeCPU)
-  print(Fore.YELLOW + "Fuel Cell Kick in progress...")
-  time.sleep(fakeCPU*2)
-  fuelGain = randint(cellMin, cellMax) #Makes new variable to store how much the random chance yeilded.
-  fuelLvl += fuelGain #Adds fuelGain variable to fuelLvl variable.
-  print(Fore.GREEN + "Fuel gained from Fuel Cell:" + Fore.WHITE + str(fuelGain))
-  fuelCheck()
+def prog10(): #Program 601, Fuel Cell kick.
+    global fuelMax
+    global fuelLvl
+    global cellMax
+    global cellMin
+    time.sleep(fakeCPU)
+    print(Fore.YELLOW + "Fuel Cell Kick in progress...")
+    time.sleep(fakeCPU*2)
+    fuelGain = randint(cellMin, cellMax) #Makes new variable to store how much the random chance yeilded.
+    fuelLvl += fuelGain #Adds fuelGain variable to fuelLvl variable.
+    print(Fore.GREEN + "Fuel gained from Fuel Cell:" + Fore.WHITE + str(fuelGain))
+    fuelCheck()
   
 def fuelCheck(): #Checks if fuel goes over maximum capacity, and adjusts accordingly.
   global fuelMax
