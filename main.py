@@ -8,6 +8,11 @@ import replit
 fakeCPU = 1  #Fake CPU delay for time.sleep function.
 statChecks = 0  #How many times the user has ran program 101: STATUS.
 programsRan = 0  #How many programs the user has ran.
+fuelMax = 1000 #Ship fuel capacity
+fuelLvl = fuelMax #Ship fuel is equal to max at init.
+fuelToLand = 100 #Fuel required to land or ascend.
+cellMax = 5 #Fuel cell kick random max.
+cellMin = 0 #Fuel cell kick random minimum.
 
 #Initialization and titles
 replit.clear()
@@ -22,11 +27,11 @@ replit.clear()
 #codeList contains all code IDs in order.
 codeList = [
     "101: STATUS", "102: RADAR ", "201: LAND  ", "211: ASCEND", "301: OPNDOR",
-    "311: CLSDOR", "401: TGTMEN", "402: GTOTGT", "501: EMRGNC", "502: ABORT "
+    "311: CLSDOR", "401: TGTMEN", "402: GTOTGT", "501: EMRGNC", "502: ABORT ", "601: FULCEL"
 ]
 #codeNumbers identifies all codes.
 codeNumbers = [
-    "101", "102", "201", "211", "301", "311", "401", "402", "501", "502"
+    "101", "102", "201", "211", "301", "311", "401", "402", "501", "502", "601"
 ]
 
 
@@ -84,7 +89,25 @@ def prog0(): #Program 101, status checking.
     print(Fore.BLUE + "STATUS CHECKS:" + Fore.WHITE + str(statChecks))
     time.sleep(fakeCPU)
     print(Fore.GREEN + "PROGRAMS RAN :" + Fore.WHITE + str(programsRan))
+
     codeInput()
-
-
+def prog8(): #Program 601, Fuel Cell kick.
+  global fuelMax
+  global fuelLvl
+  global cellMax
+  global cellMin
+  time.sleep(fakeCPU)
+  print(Fore.YELLOW + "Fuel Cell Kick in progress...")
+  time.sleep(fakeCPU*2)
+  fuelGain = randint(cellMin, cellMax) #Makes new variable to store how much the random chance yeilded.
+  fuelLvl += fuelGain #Adds fuelGain variable to fuelLvl variable.
+  print(Fore.GREEN + "Fuel gained from Fuel Cell:" + Fore.WHITE + str(fuelGain))
+  fuelCheck()
+  
+def fuelCheck(): #Checks if fuel goes over maximum capacity, and adjusts accordingly.
+  global fuelMax
+  global fuelLvl
+  if fuelLvl > fuelMax:
+    fuelLvl = fuelMax
+  codeInput()
 codeInput()
