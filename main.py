@@ -1,6 +1,6 @@
 #Imports
 import time
-from colorama import Fore
+from colorama import Fore, Back, Style
 from random import randint
 import replit
 
@@ -10,10 +10,18 @@ statChecks = 0  #How many times the user has ran program 101: STATUS.
 programsRan = 0  #How many programs the user has ran.
 fuelMax = 1000  #Ship fuel capacity
 fuelLvl = fuelMax  #Ship fuel is equal to max at init.
-fuelToLand = 100  #Fuel required to land or ascend.
 cellMax = 5  #Fuel cell kick random max.
 cellMin = 0  #Fuel cell kick random minimum.
 commandCost = 5  #Fuel required to execute a command
+target = 0 #Current target
+
+#Location list, each entry is a list of 4 variables. [Name(str), Distance from Sun(int), Can be landed on(0 or 1), Fuel required to land(int)]
+locList = [
+  ["SUN", 0, 0, 0], ["CALIDUM", 10, 1, 10], ["IGNIS", 25, 1, 30], ["DOMUM", 50, 1, 10]
+]
+
+currentLoc = randint(0, len(locList)-1)
+target = currentLoc
 
 #Initialization and titles
 replit.clear()
@@ -107,8 +115,61 @@ def prog0():  #Program 101, status checking.
     time.sleep(fakeCPU)
     print(Fore.YELLOW + "FUEL LEVEL   :" + Fore.WHITE + str(fuelLvl))
     time.sleep(fakeCPU)
+    print(Fore.MAGENTA + "LOCATION     :" + Fore.WHITE + str(locList[currentLoc][0]))
+    time.sleep(fakeCPU)
     codeInput()
 
+def prog6(): #Program 401, Target Menu
+  global currentLoc
+  global locList
+  global target
+  for i in range(len(locList)):
+    print(Fore.WHITE + str(i) + " " + Fore.MAGENTA + str(locList[i][0]) + Fore.WHITE + " - Distance: " + str(abs(locList[i][1]-locList[currentLoc][1])))
+    time.sleep(fakeCPU)
+  target = input(Fore.WHITE + "Select a Target:")
+  if int(target) > int(len(locList)-1):
+    print(Fore.RED + "Code Input Error #005 (Program Error)\nTarget Does Not Exist")
+    target = 0
+  elif currentLoc == target:
+    print(Fore.RED + "Code Input Error #005 (Program Error)\nAlready at Target")
+    target = 0
+  else:
+    print(Fore.MAGENTA + "Target Selected\nRun Program #402 to proceed to destination")
+  codeInput()
+
+def prog7(): #Program #402, Go to Target
+  global currentLoc
+  global locList
+  global target
+  global fuelLvl
+  global fuelMin
+  i = 0
+  for i in range(abs(locList[int(target)][1]-locList[int(currentLoc)][1])):
+    if abs(locList[target][1]-locList[currentLoc][1]) > fuelLvl:
+      print(Fore.YELLOW + "Insuffcient Fuel\nRun Program #601 to run the Fuel Cell\nRun Program #101 to see status")
+      break
+    print(Fore.MAGENTA + "Distance to Target: " + Fore.WHITE + str((abs(locList[target][1]-locList[currentLoc][1])-i)))
+    fuelLvl -= 1
+    time.sleep(fakeCPU)
+  if i == abs(locList[int(target)][1]-locList[currentLoc][1])-1:
+    print(Fore.MAGENTA + "Arrived at Target")
+  if currentLoc == target:
+    print(Fore.RED + "Code Input Error #005 (Program Error)\nAlready at Target\nRun Program #401 to select a Target")
+  target = 0
+  codeInput()
+  
+def prog9(): # Program #502, Abort Sequence
+  print(Fore.WHITE + Back.RED + "ABORT SEQUENCE ARMED!")
+  print(Style.RESET_ALL + Fore.RED + "Are you sure you want to abort?")
+  check = randint(100, 999)
+  check = str(check)
+  sure = input(Fore.WHITE + "Type "+ check +" to confirm:")
+  if sure == check:
+    print(Style.RESET_ALL)
+    endGame()
+  else:
+    print(Fore.WHITE + "Abort Sequence Cancelled")
+    codeInput()
 
 def prog10():  #Program 601, Fuel Cell kick.
     global fuelMax
@@ -137,7 +198,10 @@ def fuelCheck(
 
 def endGame(
 ):  #Ending the game.
-  print(Fore.RED + "Code Input Error #004 (Insufficient Fuel to Execute)\nCannot Retry. Powering Down" + Fore.WHITE)
+  global fuelLvl
+  if fuelLvl < commandCost:
+    print(Fore.RED + "Code Input Error #004 (Insufficient Fuel to Execute)\nCannot Retry. Powering Down" + Fore.WHITE)
+  fuelLvl = 0
   time.sleep(fakeCPU*2)
   replit.clear()
   time.sleep(fakeCPU*3)
@@ -147,6 +211,7 @@ def endGame(
   time.sleep(fakeCPU)
   print(Fore.GREEN + "PROGRAMS RAN :" + Fore.WHITE + str(programsRan))
   time.sleep(fakeCPU)
-  
+  exit("Thank you for Playing")
+
 if fuelLvl > 0:
   codeInput()

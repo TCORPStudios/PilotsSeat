@@ -13,3 +13,8 @@ My journey of coding this will definitely be a learning experience, and I hope t
 # This project has been revived!
 I last worked on this in March of 2021. It's been forever since I've last seen this code, and I am so glad that I bothered to comment this code. My ability to program Python has gotten rusty in recent times, so this code I wrote a year and a half ago might help me get back on my feet.
 It is now November 2022, and I wanna finish this code.
+
+---
+# Tips
+- Use Program #101 to check on the ship's status.
+- The computer requires some fuel to execute programs. The definition of insanity wastes fuel here.
