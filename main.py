@@ -17,7 +17,7 @@ commandCost = 5  #Fuel required to execute a command
 
 #Initialization and titles
 replit.clear()
-print(Fore.BLUE + "Pilot's Seat" + Fore.GREEN + "v0.1a")
+print(Fore.BLUE + "Pilot's Seat" + Fore.GREEN + "v0.2a")
 time.sleep(fakeCPU * 2)
 print(Fore.WHITE + "Code and design (C) 2021-2022 Trinity K. Martinez")
 time.sleep(fakeCPU * 2)
@@ -80,7 +80,7 @@ def progRun(programVar):  #progRun is ran to interpret input and run programs.
     for i in range(
             0, codesMax, 1
     ):  #Makes a loop from 0 to the length of codeNumbers via the codesMax variable.
-        if programVar == i:
+        if programVar >= i:
             print(Fore.WHITE + "Running program #" +
                   str(codeNumbers[programVar]))
             time.sleep(fakeCPU)
