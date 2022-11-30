@@ -10,10 +10,11 @@ statChecks = 0  #How many times the user has ran program 101: STATUS.
 programsRan = 0  #How many programs the user has ran.
 fuelMax = 1000  #Ship fuel capacity
 fuelLvl = fuelMax  #Ship fuel is equal to max at init.
-cellMax = 5  #Fuel cell kick random max.
+cellMax = 10  #Fuel cell kick random max.
 cellMin = 0  #Fuel cell kick random minimum.
 commandCost = 5  #Fuel required to execute a command
 target = 0 #Current target
+orbiting = 0 #Orbiting a planet? 0 or 1
 
 #Location list, each entry is a list of 4 variables. [Name(str), Distance from Sun(int), Can be landed on(0 or 1), Fuel required to land(int)]
 locList = [
@@ -145,13 +146,13 @@ def prog7(): #Program #402, Go to Target
   global fuelMin
   i = 0
   for i in range(abs(locList[int(target)][1]-locList[int(currentLoc)][1])):
-    if abs(locList[target][1]-locList[currentLoc][1]) > fuelLvl:
+    if abs(locList[int(target)][1]-locList[int(currentLoc)][1]) > fuelLvl:
       print(Fore.YELLOW + "Insuffcient Fuel\nRun Program #601 to run the Fuel Cell\nRun Program #101 to see status")
       break
-    print(Fore.MAGENTA + "Distance to Target: " + Fore.WHITE + str((abs(locList[target][1]-locList[currentLoc][1])-i)))
+    print(Fore.MAGENTA + "Distance to Target: " + Fore.WHITE + str((abs(locList[int(target)][1]-locList[int(currentLoc)][1])-i)))
     fuelLvl -= 1
     time.sleep(fakeCPU)
-  if i == abs(locList[int(target)][1]-locList[currentLoc][1])-1:
+  if i == abs(locList[int(target)][1]-locList[int(currentLoc)][1])-1:
     print(Fore.MAGENTA + "Arrived at Target")
   if currentLoc == target:
     print(Fore.RED + "Code Input Error #005 (Program Error)\nAlready at Target\nRun Program #401 to select a Target")
