@@ -2,7 +2,16 @@
 import time
 from colorama import Fore, Back, Style
 from random import randint
-import replit
+from os import system, name
+from time import sleep
+
+
+def clear():
+    if name == 'nt':
+        _ = system('cls')
+    else:
+        _ = system('clear')
+
 
 #Variable list
 fakeCPU = 1  #Fake CPU delay for time.sleep function.
@@ -58,14 +67,14 @@ currentLoc = randint(0, len(locList) - 1)
 target = currentLoc
 
 #Initialization and titles
-replit.clear()
+clear()
 print(Fore.BLUE + "Pilot's Seat" + Fore.GREEN + " v0.4a")
 time.sleep(fakeCPU * 2)
 print(Fore.WHITE + "Code and design (C) 2021-2022 Trinity K. Martinez")
 time.sleep(fakeCPU * 2)
 print(Fore.WHITE + "(C)2021 TCORP Studios\n(C)2022 AUVIMA Software")
 time.sleep(fakeCPU * 2)
-replit.clear()
+clear()
 
 #codeList contains all code IDs in order.
 codeList = [
@@ -357,11 +366,11 @@ def prog8():  # Program #501, Emergency Menu
         )
         print(Style.RESET_ALL)
         codeInput()
-    replit.clear()
+    clear()
     time.sleep(fakeCPU)
     print(Back.RED)
     time.sleep(0.5)
-    replit.clear()
+    clear()
     print(Fore.WHITE + "EMERGENCY STATE TRIGGERED!")
     time.sleep(fakeCPU)
     print(
@@ -396,7 +405,7 @@ def prog8():  # Program #501, Emergency Menu
     if emergency == 0:
         time.sleep(fakeCPU)
         print(Style.RESET_ALL)
-        replit.clear()
+        clear()
         time.sleep(fakeCPU * 4)
         print(Fore.WHITE + "Emergency State has been cleared.")
         codeInput()
@@ -461,7 +470,7 @@ def endGame():  #Ending the game.
             + Fore.WHITE)
     fuelLvl = 0
     time.sleep(fakeCPU * 2)
-    replit.clear()
+    clear()
     time.sleep(fakeCPU * 3)
     print("Game Over")
     time.sleep(fakeCPU)
