@@ -8,15 +8,18 @@ import replit
 fakeCPU = 1  #Fake CPU delay for time.sleep function.
 statChecks = 0  #How many times the user has ran program 101: STATUS.
 programsRan = 0  #How many programs the user has ran.
-fuelMax = 1000  #Ship fuel capacity
+fuelMax = 100  #Ship fuel capacity
 fuelLvl = fuelMax  #Ship fuel is equal to max at init.
-cellMax = 10  #Fuel cell kick random max.
+fuelWarn = fuelMax / 2  #Warn user if fuel is less than half of max.
+cellMax = 15  #Fuel cell kick random max.
 cellMin = 0  #Fuel cell kick random minimum.
 commandCost = 5  #Fuel required to execute a command
+radarCost = 5  #Fuel required to keep radar on
 target = 0  #Current target
 orbiting = 1  #Orbiting a planet? 0 or 1
 landingCount = 0  #How many times the ship has landed.
 emergency = 0  #Emergency State Triggered. 0 or 1
+radar = 0  #Radar is active. 0 or 1
 
 #Emergency list, each element is a list of emergency conditions. [Name(str), Can be fixed(0 or 1), Function name(str), Triggered(0 or 1)]
 emergencyList = [["Landing Gear is Damaged", 1, "brokenLegs()", 0],
@@ -56,7 +59,7 @@ target = currentLoc
 
 #Initialization and titles
 replit.clear()
-print(Fore.BLUE + "Pilot's Seat" + Fore.GREEN + " v0.3a")
+print(Fore.BLUE + "Pilot's Seat" + Fore.GREEN + " v0.4a")
 time.sleep(fakeCPU * 2)
 print(Fore.WHITE + "Code and design (C) 2021-2022 Trinity K. Martinez")
 time.sleep(fakeCPU * 2)
@@ -148,16 +151,28 @@ def progRun(programVar):  #progRun is ran to interpret input and run programs.
 def prog0():  #Program 101, Status Check
     global statChecks
     global fuelLvl
+    global radar
     statChecks += 1
     time.sleep(fakeCPU)
     print(Fore.BLUE + "STATUS CHECKS:" + Fore.WHITE + str(statChecks))
     time.sleep(fakeCPU)
     print(Fore.GREEN + "PROGRAMS RAN :" + Fore.WHITE + str(programsRan))
     time.sleep(fakeCPU)
-    print(Fore.YELLOW + "FUEL LEVEL   :" + Fore.WHITE + str(fuelLvl))
+    print(Fore.YELLOW + "FUEL USAGE   :" + Fore.WHITE + str(commandCost))
     time.sleep(fakeCPU)
-    print(Fore.MAGENTA + "LOCATION     :" + Fore.WHITE +
-          str(locList[currentLoc][0]))
+    if fuelLvl < fuelWarn:
+        print(Fore.YELLOW + "FUEL LEVEL   :" + Fore.WHITE + str(fuelLvl) +
+              Fore.YELLOW + " WARNING\nRun Program #601 to run the Fuel Cell")
+    else:
+        print(Fore.YELLOW + "FUEL LEVEL   :" + Fore.WHITE + str(fuelLvl))
+    time.sleep(fakeCPU)
+    if radar == 1:
+        print(Fore.MAGENTA + "LOCATION     :" + Fore.WHITE +
+              str(locList[currentLoc][0]))
+    else:
+        print(Fore.YELLOW + Style.BRIGHT +
+              "RADAR SYSTEM IS OFF\nRun Program #102 to toggle radar on/off." +
+              Style.RESET_ALL)
     time.sleep(fakeCPU)
     if orbiting == 1:
         print(Fore.MAGENTA + "IN ORBIT")
@@ -166,6 +181,33 @@ def prog0():  #Program 101, Status Check
     time.sleep(fakeCPU)
     print(Fore.CYAN + "LANDINGS     :" + Fore.WHITE + str(landingCount))
     time.sleep(fakeCPU)
+    codeInput()
+
+
+def prog1():  #Program 102, Radar System Toggle
+    global radar
+    global commandCost
+    global radarCost
+    print(Fore.MAGENTA + Style.BRIGHT + "Toggling Radar System...")
+    time.sleep(fakeCPU)
+    if radar == 0:
+        radar = 1
+        print(Fore.MAGENTA + Style.BRIGHT + "RADAR ON")
+        time.sleep(fakeCPU)
+        commandCost = commandCost + radarCost
+        print(
+            Style.RESET_ALL + Fore.MAGENTA +
+            "Navigation and Targeting Subsystem Online\nRun Program #401 to select a Target\nRun Program #402 to travel to a Target"
+        )
+    else:
+        radar = 0
+        print(Fore.MAGENTA + Style.BRIGHT + "RADAR OFF")
+        time.sleep(fakeCPU)
+        commandCost = commandCost - radarCost
+        print(
+            Style.RESET_ALL + Fore.MAGENTA +
+            "Navigation and Targeting Subsystem Offline\nDistances cannot be calculated with the radar off.\nTraveling to a Target is impossible."
+        )
     codeInput()
 
 
@@ -237,10 +279,11 @@ def prog6():  #Program 401, Target Menu
     global currentLoc
     global locList
     global target
+    global radar
     for i in range(len(locList)):
         print(Fore.WHITE + str(i) + " " + Fore.MAGENTA + str(locList[i][0]) +
               Fore.WHITE + " - Distance: " +
-              str(abs(locList[i][1] - locList[currentLoc][1])))
+              str(abs(locList[i][1] - locList[currentLoc][1]) * radar))
         time.sleep(fakeCPU)
     target = input(Fore.WHITE + "Select a Target:")
     if int(target) > int(len(locList) - 1):
@@ -248,8 +291,10 @@ def prog6():  #Program 401, Target Menu
               "Code Input Error #005 (Program Error)\nTarget Does Not Exist")
         target = 0
     elif currentLoc == target:
-        print(Fore.RED +
-              "Code Input Error #005 (Program Error)\nAlready at Target")
+        print(
+            Fore.RED +
+            "Code Input Error #005 (Program Error)\nAlready at Target\nRun Program #201 to land"
+        )
         target = 0
     else:
         print(Fore.MAGENTA +
@@ -264,6 +309,13 @@ def prog7():  #Program #402, Go to Target
     global fuelLvl
     global fuelMin
     global orbiting
+    global radar
+    if radar == 0:
+        print(
+            Fore.RED +
+            "Radar System Offline\nDistances cannot be calculated with the radar off.\nTraveling to a Target is impossible.\nRun Program #102 to toggle radar on/off."
+        )
+        codeInput()
     if orbiting == 0:
         print(
             Fore.RED +
