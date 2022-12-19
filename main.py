@@ -1,3 +1,24 @@
+#Pilot's Seat
+#Version 1.0 Source Code
+#Author: Trinity K. Martinez
+#1.0 Completion Date: December 19, 2022
+#Project Start Date: March 9, 2021
+#Special Thanks:
+#Mr. Childers, for teaching me how to program in Python back in 8th grade.
+#Talon for help with various parts of the code.
+#Raul for testing throughout the alpha.
+
+#(C)2021-2022 Trinity K. Martinez
+#(C)2021 TCORP Studios
+#(C)2022 AUVIMA Software
+
+#This game, and all its code, is licensed under the
+#Creative Commons Attribution 4.0 International License.
+#To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/legalcode
+
+#You can find the latest version of this game's source code here:
+#https://github.com/TCORPStudios/PilotsSeat
+
 #Imports
 import time
 from colorama import Fore, Back, Style
@@ -31,6 +52,9 @@ landingCount = 0  #How many times the ship has landed.
 emergency = 0  #Emergency State Triggered. 0 or 1
 radar = 0  #Radar is active. 0 or 1
 door = 0  #Door is open. 0 or 1
+reland = 1 #Can reland? 0 or 1
+revisit = 10 #Domum refuel delay.
+revisitCount = randint(0, revisit) #Non-fixed refuel delay counter.
 
 #Emergency list, each element is a list of emergency conditions. [Name(str), Can be fixed(0 or 1), Function name(str), Triggered(0 or 1)]
 emergencyList = [["Landing Gear is Damaged", 1, "brokenLegs()", 0],
@@ -81,7 +105,7 @@ target = currentLoc
 
 #Initialization and titles
 clear()
-print(Fore.BLUE + "Pilot's Seat" + Fore.GREEN + " v0.5a")
+print(Fore.BLUE + "Pilot's Seat" + Fore.GREEN + " v1.0")
 time.sleep(fakeCPU * 2)
 print(Fore.WHITE + "Code and design (C) 2021-2022 Trinity K. Martinez")
 time.sleep(fakeCPU * 2)
@@ -89,12 +113,16 @@ print(Fore.WHITE + "(C)2021 TCORP Studios\n(C)2022 AUVIMA Software")
 time.sleep(fakeCPU * 2)
 clear()
 time.sleep(fakeCPU)
-goal = int(input("Set Landing Goal (0 to exit):"))
-if goal > 0:
-  goal = int(goal)
-else:
+goal = input("Set Landing Goal (0 to exit, E for Endless):")
+if goal == "E" or goal == "e":
+  goal = 99999999
+elif goal == "0":
   print("Exiting...")
   exit()
+else:
+  goal = int(goal)
+clear()
+  
 
 #codeList contains all code IDs in order. Append new programs to the end, DO NOT insert them between other programs.
 codeList = [
@@ -257,13 +285,16 @@ def prog2():  #Program 201, Landing Program
     global currentLoc
     global locList
     global emergencyList
+    global reland
+    global revisit
+    global revisitCount
     if orbiting == 0:
         print(Fore.RED +
               "Code Input Error #005 (Program Error)\nAlready Landed")
         codeInput()
     if locList[currentLoc][2] == 1:
         if fuelLvl >= locList[currentLoc][3]:
-            landingCount += 1
+            landingCount += reland
             print(Fore.CYAN + "Landing Procedure Initialized")
             time.sleep(fakeCPU)
             for i in range(locList[currentLoc][3], 0, -1):
@@ -272,6 +303,10 @@ def prog2():  #Program 201, Landing Program
                 fuelLvl -= 1
             print(Fore.CYAN + "Landing Procedure Completed")
             orbiting = 0
+            if reland == 1:
+              if revisitCount > 0:
+                revisitCount -= 1
+            reland = 0
             time.sleep(fakeCPU)
             failure = randint(0, 5)
             if failure >= 5:
@@ -297,6 +332,7 @@ def prog3():  #Program 202, Ascent Program
     if door == 1:
       print(Fore.RED + "Door is Open\nRun Program #302 to close the door.")
       time.sleep(fakeCPU)
+      codeInput()
     if orbiting == 1:
         print(Fore.RED +
               "Code Input Error #005 (Program Error)\nAlready in Orbit")
@@ -427,6 +463,7 @@ def prog7():  #Program #402, Go to Target
     global fuelMin
     global orbiting
     global radar
+    global reland
     if radar == 0:
         print(
             Fore.RED +
@@ -455,6 +492,7 @@ def prog7():  #Program #402, Go to Target
         time.sleep(fakeCPU)
     if i == abs(locList[int(target)][1] - locList[int(currentLoc)][1]) - 1:
         print(Fore.MAGENTA + "Arrived at Target")
+        reland = 1
         currentLoc = int(target)
     if currentLoc == target:
         print(
@@ -611,11 +649,9 @@ def ignis():
     print(
         Fore.YELLOW +
         "Depending on the location of the landing, you may be able to find a spare "
-        + Style.BRIGHT + "fuel cell, " + Style.RESET_ALL + Fore.YELLOW +
-        "or harvest the soil for a " + Style.BRIGHT + "complete refuel." +
-        Style.RESET_ALL + Fore.WHITE)
+        + Style.BRIGHT + "fuel cell." + Style.RESET_ALL + Fore.WHITE)
     time.sleep(fakeCPU)
-    print("(S)earch for Fuel Cell? - (H)arvest Soil? - (R)eturn to Lander?")
+    print("(S)earch for Fuel Cell? - (R)eturn to Lander?")
     search = input()
     if search == "s" or search == "S":
         print(Fore.YELLOW + "Searching for a spare fuel cell...")
@@ -638,16 +674,6 @@ def ignis():
         else:
             print(Fore.YELLOW + "No spare fuel cell found.")
             codeInput()
-    elif search == "h" or search == "H":
-        print(Fore.YELLOW + "Harvesting Soil...")
-        time.sleep(fakeCPU)
-        searchFuel = randint(0, fuelMax)
-        time.sleep(fakeCPU)
-        print(Fore.YELLOW + "Harvesting complete.")
-        fuelLvl += searchFuel
-        print(Fore.GREEN + "Fuel gained from Soil Harvest:" + Fore.WHITE +
-              str(searchFuel))
-        fuelCheck()
     else:
         print(Fore.YELLOW + "Returning to Lander...")
         time.sleep(fakeCPU)
@@ -655,7 +681,22 @@ def ignis():
 
 
 def domum():
-    print(Fore.RED + "Under construction. Perhaps in the next version.")
+    global fuelLvl
+    global fuelMax
+    global revisit
+    global revisitCount
+    print(Fore.YELLOW + "After landing on Domum, you are in a safe environment.")
+    time.sleep(fakeCPU)
+    print(Fore.YELLOW + "The cities of Domum remind you of the past.")
+    time.sleep(fakeCPU)
+    print(Fore.YELLOW + "Domum has a Fuelling station nearby, but takes some time to extract fuel from the depleted soil.")
+    time.sleep(fakeCPU)
+    if revisitCount == 0:
+      fuelLvl = fuelMax
+      revisitCount = revisit
+      print(Fore.GREEN + "Domum's local Fuel station has refueled your spacecraft completely.")
+    else:
+      print(Fore.GREEN + "Domum's local Fuel station cannot refuel your spacecraft yet.\nCheck back after visiting different locations " + Fore.WHITE + str(revisitCount) + Fore.GREEN + " more times.")
     codeInput()
 
 
