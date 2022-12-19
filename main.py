@@ -21,6 +21,7 @@ fuelMax = 500  #Ship fuel capacity
 fuelLvl = fuelMax  #Ship fuel is equal to max at init.
 fuelWarn = fuelMax / 4  #Warn user if fuel is less than a quarter of max.
 cellMax = 15  #Fuel cell kick random max.
+cellMaxCap = cellMax #Unchanging fuel cell kick max.
 cellMin = 0  #Fuel cell kick random minimum.
 commandCost = 5  #Fuel required to execute a command
 radarCost = 5  #Fuel required to keep radar on
@@ -600,6 +601,8 @@ def ignis():
     global fuelMax
     global emergency
     global emergencyList
+    global cellMax 
+    global cellMaxCap
     print(Fore.YELLOW +
           "After arriving on Ignis, you are in a safe environment.")
     time.sleep(fakeCPU)
@@ -626,6 +629,7 @@ def ignis():
                     "Emergency Systems previously reported a fuel cell failure.\n The damaged fuel cell has been replaced."
                 )
                 emergencyList[1][3] = 0
+                cellMax = cellMaxCap
                 codeInput()
             else:
                 print(Fore.YELLOW + "Fuel Cell is already in good condition.")
@@ -657,3 +661,4 @@ def domum():
 
 if fuelLvl > 0:
     codeInput()
+  
