@@ -17,9 +17,9 @@ def clear():
 fakeCPU = 1  #Fake CPU delay for time.sleep function.
 statChecks = 0  #How many times the user has ran program 101: STATUS.
 programsRan = 0  #How many programs the user has ran.
-fuelMax = 100  #Ship fuel capacity
+fuelMax = 500  #Ship fuel capacity
 fuelLvl = fuelMax  #Ship fuel is equal to max at init.
-fuelWarn = fuelMax / 2  #Warn user if fuel is less than half of max.
+fuelWarn = fuelMax / 4  #Warn user if fuel is less than a quarter of max.
 cellMax = 15  #Fuel cell kick random max.
 cellMin = 0  #Fuel cell kick random minimum.
 commandCost = 5  #Fuel required to execute a command
@@ -29,10 +29,12 @@ orbiting = 1  #Orbiting a planet? 0 or 1
 landingCount = 0  #How many times the ship has landed.
 emergency = 0  #Emergency State Triggered. 0 or 1
 radar = 0  #Radar is active. 0 or 1
+door = 0  #Door is open. 0 or 1
 
 #Emergency list, each element is a list of emergency conditions. [Name(str), Can be fixed(0 or 1), Function name(str), Triggered(0 or 1)]
 emergencyList = [["Landing Gear is Damaged", 1, "brokenLegs()", 0],
-                 ["Fuel Cell is Damaged", 0, "brokenFuel()", 0]]
+                 ["Fuel Cell is Damaged", 0, "brokenFuel()", 0],
+                 ["EVA Hatch is Damaged", 1, "brokenHatch()", 0]]
 
 #Emergency functions
 
@@ -54,29 +56,46 @@ def brokenLegs():
 
 def brokenFuel():
     global emergency
+    global emergencyList
     global cellMax
     cellMax = 0
     emergencyList[1][3] = 0
 
 
-#Location list, each element is a list of 4 variables. [Name(str), Distance from Sun(int), Can be landed on(0 or 1), Fuel required to land(int)]
-locList = [["SUN", 0, 0, 0], ["CALIDUM", 10, 1, 10], ["IGNIS", 25, 1, 30],
-           ["DOMUM", 50, 1, 10]]
+def brokenHatch():
+    global emergency
+    global door
+    door = 0
+    emergencyList[2][3] = 0
+
+
+#Location list, each element is a list of variables. [Name(str), Distance from Sun(int), Can be landed on(0 or 1), Fuel required to land(int), Atmosphere present(0 or 1), Embarking program(str)]
+locList = [["SUN", 0, 0, 0, 0, "codeInput()"],
+           ["CALIDUM", 10, 1, 10, 0, "codeInput()"],
+           ["IGNIS", 25, 1, 30, 1, "ignis()"],
+           ["DOMUM", 50, 1, 10, 1, "domum()"]]
 
 currentLoc = randint(0, len(locList) - 1)
 target = currentLoc
 
 #Initialization and titles
 clear()
-print(Fore.BLUE + "Pilot's Seat" + Fore.GREEN + " v0.4a")
+print(Fore.BLUE + "Pilot's Seat" + Fore.GREEN + " v0.5a")
 time.sleep(fakeCPU * 2)
 print(Fore.WHITE + "Code and design (C) 2021-2022 Trinity K. Martinez")
 time.sleep(fakeCPU * 2)
 print(Fore.WHITE + "(C)2021 TCORP Studios\n(C)2022 AUVIMA Software")
 time.sleep(fakeCPU * 2)
 clear()
+time.sleep(fakeCPU)
+goal = int(input("Set Landing Goal (0 to exit):"))
+if goal > 0:
+  goal = int(goal)
+else:
+  print("Exiting...")
+  exit()
 
-#codeList contains all code IDs in order.
+#codeList contains all code IDs in order. Append new programs to the end, DO NOT insert them between other programs.
 codeList = [
     "101: STATUS", "102: RADAR ", "201: LAND  ", "202: ASCEND", "301: OPNDOR",
     "302: CLSDOR", "401: TGTMEN", "402: GTOTGT", "501: EMRGNC", "502: ABORT ",
@@ -91,7 +110,15 @@ codeNumbers = [
 #codeInput is run to get user input and store it into a variable for codeInterpreter.
 def codeInput():
     global emergency
+    global goal
     global emergencyList
+    if landingCount == goal:
+        print(Fore.GREEN + "Landing Count Reached")
+        time.sleep(fakeCPU*4)
+        clear()
+        print(Fore.GREEN + "Your journey has come to an end, you are satsified with your exploration of the universe!")
+        time.sleep(fakeCPU*4)
+        endGame()
     emergency = 0
     if fuelLvl <= 0:  #When fuelLvl reaches 0 or lower, end the game.
         endGame()
@@ -184,9 +211,11 @@ def prog0():  #Program 101, Status Check
               Style.RESET_ALL)
     time.sleep(fakeCPU)
     if orbiting == 1:
-        print(Fore.MAGENTA + "IN ORBIT")
+        print(Fore.MAGENTA +
+              "IN ORBIT\nRun Program #201 to initialize Landing Procedure.")
     else:
-        print(Fore.MAGENTA + "LANDED")
+        print(Fore.MAGENTA +
+              "LANDED\nRun Program #202 to initialize Ascent Procedure.")
     time.sleep(fakeCPU)
     print(Fore.CYAN + "LANDINGS     :" + Fore.WHITE + str(landingCount))
     time.sleep(fakeCPU)
@@ -263,6 +292,10 @@ def prog3():  #Program 202, Ascent Program
     global fuelLvl
     global currentLoc
     global locList
+    global door
+    if door == 1:
+      print(Fore.RED + "Door is Open\nRun Program #302 to close the door.")
+      time.sleep(fakeCPU)
     if orbiting == 1:
         print(Fore.RED +
               "Code Input Error #005 (Program Error)\nAlready in Orbit")
@@ -282,6 +315,80 @@ def prog3():  #Program 202, Ascent Program
             "Insufficient Fuel\nRun Program #601 to run the Fuel Cell\nRun Program #101 to see status"
         )
     codeInput()
+
+
+def prog4():  #Program 301, Open Door
+    global currentLoc
+    global locList
+    global orbiting
+    global door
+    if orbiting == 1:
+        print(
+            Fore.RED +
+            "Code Input Error #005 (Program Error)\nCannot Open Door while in orbit.\nRun Program #201 to land."
+        )
+        time.sleep(fakeCPU)
+        codeInput()
+    if door == 0:
+        if locList[currentLoc][4] == 1:
+            print(Fore.BLUE + Style.BRIGHT + "Opening Door..." +
+                  Style.RESET_ALL)
+            time.sleep(fakeCPU)
+            door = 1
+            print(Fore.BLUE + "Door Open")
+            time.sleep(fakeCPU)
+            print("Embark on " + locList[currentLoc][0] + "? (Y/N)")
+            embark = input()
+            if embark == "Y" or embark == "y":
+                print(Fore.BLUE + "Embarking on " + locList[currentLoc][0] +
+                      "...")
+                time.sleep(fakeCPU)
+                eval(locList[currentLoc][5])
+            elif embark == "N" or embark == "n":
+                print(Fore.BLUE + "Returning to Cockpit...")
+                time.sleep(fakeCPU)
+                codeInput()
+            else:
+                print(Fore.BLUE + "Invalid Input\nReturning to Cockpit...")
+                time.sleep(fakeCPU)
+                codeInput()
+        else:
+            print(Fore.BLUE + locList[currentLoc][0] +
+                  " has no breathable Atmosphere.")
+            time.sleep(fakeCPU)
+            codeInput()
+    else:
+        print(Fore.BLUE + "Door is already open.")
+        time.sleep(fakeCPU)
+        print("Embark on " + locList[currentLoc][0] + "? (Y/N)")
+        embark = input()
+        if embark == "Y" or embark == "y":
+            print(Fore.BLUE + "Embarking on " + locList[currentLoc][0] + "...")
+            time.sleep(fakeCPU)
+            eval(locList[currentLoc][5])
+        elif embark == "N" or embark == "n":
+            print(Fore.BLUE + "Returning to Cockpit...")
+            time.sleep(fakeCPU)
+            codeInput()
+        else:
+            print(Fore.BLUE + "Invalid Input\nReturning to Cockpit...")
+            time.sleep(fakeCPU)
+            codeInput()
+
+
+def prog5():  #Program 302, Close Door
+    global door
+    if door == 1:
+        print(Fore.BLUE + "Closing Door...")
+        time.sleep(fakeCPU)
+        door = 0
+        print(Fore.BLUE + "Door Closed")
+        time.sleep(fakeCPU)
+        codeInput()
+    else:
+        print(Fore.BLUE + "Door is already closed.")
+        time.sleep(fakeCPU)
+        codeInput()
 
 
 def prog6():  #Program 401, Target Menu
@@ -347,12 +454,13 @@ def prog7():  #Program #402, Go to Target
         time.sleep(fakeCPU)
     if i == abs(locList[int(target)][1] - locList[int(currentLoc)][1]) - 1:
         print(Fore.MAGENTA + "Arrived at Target")
+        currentLoc = int(target)
     if currentLoc == target:
         print(
             Fore.RED +
             "Code Input Error #005 (Program Error)\nAlready at Target\nRun Program #401 to select a Target"
         )
-    target = 0
+        target = 0
     codeInput()
 
 
@@ -481,6 +589,70 @@ def endGame():  #Ending the game.
     print(Fore.CYAN + "LANDINGS     :" + Fore.WHITE + str(landingCount))
     time.sleep(fakeCPU)
     exit("Thank you for Playing")
+
+
+#Embarking programs
+
+
+def ignis():
+    global door
+    global fuelLvl
+    global fuelMax
+    global emergency
+    global emergencyList
+    print(Fore.YELLOW +
+          "After arriving on Ignis, you are in a safe environment.")
+    time.sleep(fakeCPU)
+    print(Fore.YELLOW + "The soil of Ignis is very rich in minerals.")
+    time.sleep(fakeCPU)
+    print(
+        Fore.YELLOW +
+        "Depending on the location of the landing, you may be able to find a spare "
+        + Style.BRIGHT + "fuel cell, " + Style.RESET_ALL + Fore.YELLOW +
+        "or harvest the soil for a " + Style.BRIGHT + "complete refuel." +
+        Style.RESET_ALL + Fore.WHITE)
+    time.sleep(fakeCPU)
+    print("(S)earch for Fuel Cell? - (H)arvest Soil? - (R)eturn to Lander?")
+    search = input()
+    if search == "s" or search == "S":
+        print(Fore.YELLOW + "Searching for a spare fuel cell...")
+        time.sleep(fakeCPU)
+        searchFuel = randint(0, 7)
+        if searchFuel == 7:
+            print(Fore.YELLOW + "A fuel cell has been found!")
+            if emergencyList[1][3] == 1:
+                print(
+                    Fore.YELLOW +
+                    "Emergency Systems previously reported a fuel cell failure.\n The damaged fuel cell has been replaced."
+                )
+                emergencyList[1][3] = 0
+                codeInput()
+            else:
+                print(Fore.YELLOW + "Fuel Cell is already in good condition.")
+                codeInput()
+
+        else:
+            print(Fore.YELLOW + "No spare fuel cell found.")
+            codeInput()
+    elif search == "h" or search == "H":
+        print(Fore.YELLOW + "Harvesting Soil...")
+        time.sleep(fakeCPU)
+        searchFuel = randint(0, fuelMax)
+        time.sleep(fakeCPU)
+        print(Fore.YELLOW + "Harvesting complete.")
+        fuelLvl += searchFuel
+        print(Fore.GREEN + "Fuel gained from Soil Harvest:" + Fore.WHITE +
+              str(searchFuel))
+        fuelCheck()
+    else:
+        print(Fore.YELLOW + "Returning to Lander...")
+        time.sleep(fakeCPU)
+        codeInput()
+
+
+def domum():
+    print(Fore.RED + "Under construction. Perhaps in the next version.")
+    codeInput()
 
 
 if fuelLvl > 0:
