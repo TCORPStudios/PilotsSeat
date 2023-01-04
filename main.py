@@ -1,5 +1,5 @@
 #Pilot's Seat
-#Version 1.0 Source Code
+#Version 1.1 Source Code
 #Author: Trinity K. Martinez
 #1.0 Completion Date: December 19, 2022
 #Project Start Date: March 9, 2021
@@ -8,15 +8,15 @@
 #Talon for help with various parts of the code.
 #Raul for testing throughout the alpha.
 
-#(C)2021-2022 Trinity K. Martinez
+#(C)2021-2023 Trinity K. Martinez
 #(C)2021 TCORP Studios
-#(C)2022 AUVIMA Software
+#(C)2022-2023 AUVIMA Software
 
 #This game, and all its code, is licensed under the
 #Creative Commons Attribution 4.0 International License.
 #To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/legalcode
 
-#You can find the latest version of this game's source code here:
+#You can find the latest version of this game's source code here, in addition to the modding wiki.
 #https://github.com/TCORPStudios/PilotsSeat
 
 #Imports
@@ -105,14 +105,21 @@ target = currentLoc
 
 #Initialization and titles
 clear()
-print(Fore.BLUE + "Pilot's Seat" + Fore.GREEN + " v1.0")
+print(Fore.BLUE + "Pilot's Seat" + Fore.GREEN + " v1.1")
 time.sleep(fakeCPU * 2)
-print(Fore.WHITE + "Code and design (C) 2021-2022 Trinity K. Martinez")
+print(Fore.WHITE + "Code and design (C) 2021-2023 Trinity K. Martinez")
 time.sleep(fakeCPU * 2)
-print(Fore.WHITE + "(C)2021 TCORP Studios\n(C)2022 AUVIMA Software")
+print(Fore.WHITE + "(C)2021 TCORP Studios\n(C)2022-2023 AUVIMA Software")
 time.sleep(fakeCPU * 2)
 clear()
 time.sleep(fakeCPU)
+fakeCPU = float(input("Set game speed (10 for Original)"))
+if fakeCPU <= 0:
+  fakeCPU = 0
+elif fakeCPU > 0:
+  fakeCPU = fakeCPU/10
+else:
+  fakeCPU = 1
 goal = input("Set Landing Goal (0 to exit, E for Endless):")
 if goal == "E" or goal == "e":
   goal = 99999999
@@ -122,7 +129,18 @@ elif goal == "0":
 else:
   goal = int(goal)
 clear()
-  
+time.sleep(1)
+print(Fore.YELLOW + "The computer has a note next to it.")
+time.sleep(fakeCPU)
+print(Fore.YELLOW + "It has three numbers written on it.")
+time.sleep(fakeCPU)
+print(Fore.YELLOW + "101, 301, and 502")
+time.sleep(fakeCPU)
+print(Fore.YELLOW + "You hardly remember anything from training, but you recognize the three numbers as computer commands...")
+time.sleep(fakeCPU)
+print(Fore.YELLOW + "101, Check status\n301, Open the door\nand 502, is to abort.")
+time.sleep(fakeCPU)
+print(Fore.YELLOW + "Good luck...")
 
 #codeList contains all code IDs in order. Append new programs to the end, DO NOT insert them between other programs.
 codeList = [
