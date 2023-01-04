@@ -3,6 +3,12 @@ A game about maintaining a little spaceship.
 
 ### Play it now at https://replit.com/@TrinityMartinez/PilotsSeat?v=1
 
+## Dependencies
+- colorama
+- os
+- time
+- random
+
 An endless game in which you take command of a small spacecraft. Your only method of input is entering codes to a command line to run different "programs", which can report the ship's status, land and take off from surfaces, eject you out, and more.
 There isn't really a goal, yet. Just take care of your ship however long you want to.
 
